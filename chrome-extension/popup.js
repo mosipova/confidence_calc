@@ -298,7 +298,7 @@ function render() {
     if (r.bad) { el.innerHTML = 'конверсий больше посетителей'; return; }
     if (!s) { el.innerHTML = esc(empty); return; }
     const d = decFor((s.hi - s.lo) * 100);
-    el.innerHTML = `ДИ ${cl}%: <b>${esc(pct(s.lo, d))} — ${esc(pct(s.hi, d))}</b> <i>±${esc(ru((s.hi - s.lo) / 2 * 100, d))} п.п.</i>`;
+    el.innerHTML = `ДИ ${cl}%: <b>${esc(pct(s.lo, d))} — ${esc(pct(s.hi, d))}</b>`;
   };
   panel(A, a, S.a.ci, 'введите числа');
   panel(B, b, S.b.ci, bTouched ? 'введите числа' : 'для сравнения');
@@ -307,8 +307,8 @@ function render() {
   const vEl = $('verdict');
   if (!c) {
     vEl.classList.add('idle');
-    $('vMain').innerHTML = a ? 'Добавьте вторую выборку' : 'Одна выборка — интервал, две — сравнение';
-    $('vSub').innerHTML = a ? 'чтобы сравнить конверсии' : '';
+    $('vMain').innerHTML = a ? 'Добавьте вторую выборку' : 'Заполните выборку A';
+    $('vSub').innerHTML = a ? 'чтобы сравнить конверсии' : 'интервал посчитается сразу, вторая выборка — по желанию';
   } else {
     vEl.classList.remove('idle');
     const dec = decFor(Math.abs(c.hi - c.lo) * 100);
@@ -317,7 +317,7 @@ function render() {
       : 'Разница не значима';
     const rel = c.rel !== null ? ` (${c.rel > 0 ? '+' : '−'}${ru(Math.abs(c.rel) * 100, 1)}% отн.)` : '';
     $('vSub').innerHTML = `${esc(pp(c.d, dec))}${esc(rel)}`
-      + ` · погрешность (ДИ ${cl}%): от ${esc(ppn(c.lo, dec))} до ${esc(pp(c.hi, dec))}`
+      + ` · ДИ ${cl}%: от ${esc(ppn(c.lo, dec))} до ${esc(pp(c.hi, dec))}`
       + ` <i>${esc(pval(c.p))}</i>`;
   }
 
@@ -425,11 +425,12 @@ function drawDist(a, b) {
 
 /* ── график 2: распределение разницы, ноль как опора ── */
 function drawDiff(c) {
-  const fig = $('diffFig');
-  if (!c) { fig.hidden = true; return; }
-  fig.hidden = false;
-
-  const W = 488, padL = 26, padR = 26, top = 6, base = 58, barY = 74, axisY = 92;
+  const W = 488, padL = 52, padR = 52, top = 6, base = 58, barY = 74, axisY = 92;
+  if (!c) {
+    diff.innerHTML = `<text x="${W / 2}" y="40" text-anchor="middle" font-size="11.5" fill="var(--text-muted)">появится, когда заполните обе выборки</text>`;
+    diff.setAttribute('aria-label', 'Разница появится после заполнения второй выборки');
+    return;
+  }
   const sd = c.se || 1e-9;
   let d0 = Math.min(c.d - 4 * sd, c.lo, 0), d1 = Math.max(c.d + 4 * sd, c.hi, 0);
   if (d1 - d0 < 1e-9) { d0 -= 5e-4; d1 += 5e-4; }
@@ -466,6 +467,9 @@ function drawDiff(c) {
   m += `<circle cx="${sx(c.d).toFixed(1)}" cy="${barY}" r="3.5" fill="${color}" stroke="var(--surface-1)" stroke-width="2"/>`;
 
   const dec = decFor(Math.abs(c.hi - c.lo) * 100);
+  const halo = 'stroke="var(--surface-1)" stroke-width="3" paint-order="stroke"';
+  m += `<text x="${(sx(c.lo) - 6).toFixed(1)}" y="${barY + 3.5}" text-anchor="end" font-size="9" fill="var(--text-muted)" font-variant-numeric="tabular-nums" ${halo}>${esc(ppn(c.lo, dec))}</text>`;
+  m += `<text x="${(sx(c.hi) + 6).toFixed(1)}" y="${barY + 3.5}" font-size="9" fill="var(--text-muted)" font-variant-numeric="tabular-nums" ${halo}>${esc(ppn(c.hi, dec))}</text>`;
   diff.innerHTML = g + m;
   diff.setAttribute('aria-label', `Разница B − A: ${pp(c.d, dec)}, интервал ${pp(c.lo, dec)} … ${pp(c.hi, dec)}`);
 }
