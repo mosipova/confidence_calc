@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>Доверительный интервал конверсии</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+<div class="app">
+
+  <header class="top">
+    <h1>Доверительный интервал</h1>
+    <div class="ctrl">
+      <div class="seg conf" id="conf" role="radiogroup" aria-label="Уровень доверия">
+        <button type="button" data-cl="90" role="radio" aria-checked="false">90%</button>
+        <button type="button" data-cl="95" role="radio" aria-checked="true" class="on">95%</button>
+        <button type="button" data-cl="99" role="radio" aria-checked="false">99%</button>
+      </div>
+      <button type="button" class="icon-btn" id="theme" aria-pressed="false" title="Переключить на тёмную тему" aria-label="Переключить на тёмную тему">
+        <svg class="ic-sun" viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
+          <circle cx="8" cy="8" r="3.1"/>
+          <path d="M8 1.1v1.5M8 13.4v1.5M1.1 8h1.5M13.4 8h1.5M3.2 3.2l1.1 1.1M11.7 11.7l1.1 1.1M12.8 3.2l-1.1 1.1M4.3 11.7l-1.1 1.1"/>
+        </svg>
+        <svg class="ic-moon" viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true">
+          <path d="M13.4 9.9A5.8 5.8 0 0 1 6.1 2.6 5.8 5.8 0 1 0 13.4 9.9z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="samples">
+    <section class="pane" id="paneA">
+      <div class="pane-head"><span class="dot dot-a"></span><span class="pane-name">Выборка A</span></div>
+      <div class="row"><label for="nA">Посетители</label><input id="nA" type="text" inputmode="numeric" autocomplete="off" placeholder="10 000"></div>
+      <div class="row"><label for="xA">Конверсии</label><input id="xA" type="text" inputmode="numeric" autocomplete="off" placeholder="500"></div>
+      <div class="row"><label for="pA">Конверсия, %</label><input id="pA" class="pct" type="text" inputmode="decimal" autocomplete="off" placeholder="5"></div>
+      <div class="ci" id="ciA">введите числа</div>
+    </section>
+
+    <section class="pane idle" id="paneB">
+      <div class="pane-head"><span class="dot dot-b"></span><span class="pane-name">Выборка B</span></div>
+      <div class="row"><label for="nB">Посетители</label><input id="nB" type="text" inputmode="numeric" autocomplete="off" placeholder="10 000"></div>
+      <div class="row"><label for="xB">Конверсии</label><input id="xB" type="text" inputmode="numeric" autocomplete="off" placeholder="560"></div>
+      <div class="row"><label for="pB">Конверсия, %</label><input id="pB" class="pct" type="text" inputmode="decimal" autocomplete="off" placeholder="5,6"></div>
+      <div class="ci" id="ciB">для сравнения</div>
+    </section>
+  </div>
+
+  <div class="verdict idle" id="verdict">
+    <span class="v-main" id="vMain">Добавьте вторую выборку</span>
+    <span class="v-sub" id="vSub">чтобы сравнить конверсии</span>
+  </div>
+
+  <figure class="chart" id="distFig">
+    <figcaption>Распределение конверсии <span id="clCaption">· ДИ 95%</span></figcaption>
+    <svg id="dist" viewBox="0 0 488 164" width="488" height="164" role="img" aria-label="Распределения конверсии с доверительными интервалами"></svg>
+    <div class="tip" id="tip" hidden></div>
+  </figure>
+
+  <figure class="chart" id="diffFig" hidden>
+    <figcaption>Разница B − A, п.п.</figcaption>
+    <svg id="diff" viewBox="0 0 488 98" width="488" height="98" role="img" aria-label="Распределение разницы конверсий"></svg>
+  </figure>
+
+  <footer class="bottom">
+    <span id="warn" class="warn" hidden>
+      <span id="warnText"></span>
+      <button type="button" class="hint" id="warnHint" aria-label="Что значит «мало наблюдений»" aria-expanded="false">?</button>
+      <span class="hint-pop" id="warnPop" role="tooltip"></span>
+    </span>
+    <button type="button" id="reset" class="link">Сбросить</button>
+  </footer>
+
+</div>
+<script src="popup.js"></script>
+</body>
+</html>

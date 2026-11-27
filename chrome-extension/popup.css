@@ -1,0 +1,213 @@
+/* ── токены ───────────────────────────────────────────────── */
+:root {
+  color-scheme: light;
+  --surface-1: #fcfcfb;
+  --surface-2: #f4f3ef;
+  --border: #e4e3dd;
+  --border-soft: #edece7;
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --text-muted: #949389;
+  --grid: #ebeae5;
+
+  --series-a: #2a78d6;          /* синий */
+  --series-b: #e34948;          /* красный */
+  --series-a-text: #256abf;     /* на шаг темнее — чтобы буква читалась как текст */
+  --series-b-text: #c42f2e;
+  --fill-a: #2a78d61c;          /* светло-голубая заливка */
+  --fill-a-ci: #2a78d63d;
+  --fill-b: #e349481c;          /* розовая заливка */
+  --fill-b-ci: #e349483d;
+  --neutral-mark: #8a8984;
+  --neutral-fill: #8a898414;
+  --neutral-fill-ci: #8a898433;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --surface-1: #1a1a19;
+    --surface-2: #232321;
+    --border: #35352f;
+    --border-soft: #2b2b28;
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted: #8d8c83;
+    --grid: #2e2e2a;
+
+    --series-a: #3987e5;
+    --series-b: #e66767;
+    --series-a-text: #5598e7;
+    --series-b-text: #e66767;
+    --fill-a: #3987e526;
+    --fill-a-ci: #3987e55c;
+    --fill-b: #e6676726;
+    --fill-b-ci: #e667675c;
+    --neutral-mark: #8d8c83;
+    --neutral-fill: #8d8c831f;
+    --neutral-fill-ci: #8d8c8340;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --surface-1: #1a1a19;
+  --surface-2: #232321;
+  --border: #35352f;
+  --border-soft: #2b2b28;
+  --text-primary: #ffffff;
+  --text-secondary: #c3c2b7;
+  --text-muted: #8d8c83;
+  --grid: #2e2e2a;
+
+  --series-a: #3987e5;
+  --series-b: #e66767;
+  --series-a-text: #5598e7;
+  --series-b-text: #e66767;
+  --fill-a: #3987e526;
+  --fill-a-ci: #3987e55c;
+  --fill-b: #e6676726;
+  --fill-b-ci: #e667675c;
+  --neutral-mark: #8d8c83;
+  --neutral-fill: #8d8c831f;
+  --neutral-fill-ci: #8d8c8340;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+
+body {
+  width: 520px;
+  font: 13px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+  background: var(--surface-1);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+.app { padding: 10px 16px 6px; }
+
+/* ── шапка ────────────────────────────────────────────────── */
+.top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.top h1 { margin: 0; font-size: 12.5px; font-weight: 600; letter-spacing: -0.1px; }
+
+.ctrl { display: flex; align-items: center; gap: 6px; }
+.seg { display: flex; gap: 2px; padding: 2px; background: var(--surface-2); border-radius: 7px; }
+.seg button {
+  font: inherit; font-size: 11px; font-variant-numeric: tabular-nums;
+  padding: 2px 8px; border: 0; border-radius: 5px;
+  background: transparent; color: var(--text-secondary); cursor: pointer;
+}
+.seg button:hover { color: var(--text-primary); }
+.seg button.on { background: var(--surface-1); color: var(--text-primary); box-shadow: 0 1px 2px #0000001a; }
+/* тема: одна кнопка, иконка показывает текущее состояние */
+.icon-btn {
+  display: flex; align-items: center; padding: 5px 7px;
+  border: 0; border-radius: 7px; cursor: pointer;
+  background: var(--surface-2); color: var(--text-secondary);
+}
+.icon-btn:hover { color: var(--text-primary); }
+.icon-btn svg { display: block; }
+:root[data-theme="dark"] .ic-sun { display: none; }
+:root:not([data-theme="dark"]) .ic-moon { display: none; }
+
+/* ── выборки ──────────────────────────────────────────────── */
+.samples { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+.pane {
+  padding: 8px 10px 7px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  transition: border-color .15s;
+}
+.pane.idle { border-color: var(--border-soft); }
+.pane.idle .pane-name, .pane.idle label, .pane.idle .ci { color: var(--text-muted); }
+.pane.idle .dot { opacity: .35; }
+
+.pane-head { display: flex; align-items: center; gap: 6px; margin-bottom: 7px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.dot-a { background: var(--series-a); }
+.dot-b { background: var(--series-b); }
+.pane-name { font-size: 11.5px; font-weight: 600; color: var(--text-secondary); letter-spacing: .2px; }
+
+.row { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 4px; }
+.row label { font-size: 11.5px; color: var(--text-secondary); }
+.row input {
+  font: inherit; font-size: 13px; font-variant-numeric: tabular-nums;
+  width: 96px; padding: 4px 7px; text-align: right;
+  border: 1px solid var(--border); border-radius: 6px;
+  background: var(--surface-1); color: var(--text-primary);
+}
+.row input.pct { font-weight: 600; }
+.row input::placeholder { color: var(--text-muted); opacity: .55; font-weight: 400; }
+.row input:focus { outline: none; }
+#paneA input:focus { border-color: var(--series-a); box-shadow: 0 0 0 3px var(--fill-a-ci); }
+#paneB input:focus { border-color: var(--series-b); box-shadow: 0 0 0 3px var(--fill-b-ci); }
+.row input.bad { border-color: var(--series-b); }
+#paneB .row input.bad { border-color: var(--series-a); }
+
+.ci {
+  margin-top: 6px; font-size: 11px; color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+.ci b { font-weight: 600; color: var(--text-primary); }
+.ci i { font-style: normal; color: var(--text-muted); }
+
+/* ── вывод ────────────────────────────────────────────────── */
+.verdict {
+  display: flex; align-items: baseline; justify-content: center; gap: 8px; flex-wrap: wrap;
+  text-align: center;
+  margin: 7px 0 2px; padding: 7px 10px;
+  border-radius: 10px; background: var(--surface-2);
+}
+.verdict.idle { background: transparent; padding: 6px 0 0; }
+.v-main { font-size: 14px; font-weight: 600; letter-spacing: -0.2px; }
+.v-main .s-a { color: var(--series-a-text); }
+.v-main .s-b { color: var(--series-b-text); }
+.verdict.idle .v-main { font-size: 12.5px; font-weight: 500; color: var(--text-muted); }
+.v-sub { font-size: 11px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+.v-sub i { font-style: normal; color: var(--text-muted); margin-left: 4px; }
+.verdict.idle .v-sub { color: var(--text-muted); }
+
+/* ── графики ──────────────────────────────────────────────── */
+.chart { position: relative; margin: 4px 0 0; }
+.chart figcaption { font-size: 10px; color: var(--text-muted); letter-spacing: .2px; margin: 1px 0 0; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+
+.tip {
+  position: absolute; pointer-events: none; z-index: 2;
+  padding: 4px 7px; border-radius: 6px;
+  background: var(--text-primary); color: var(--surface-1);
+  font-size: 10.5px; line-height: 1.35; white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 2px 8px #00000026;
+}
+.tip i { font-style: normal; opacity: .65; }
+
+/* ── низ ──────────────────────────────────────────────────── */
+.bottom { display: flex; align-items: center; gap: 8px; margin-top: 3px; min-height: 13px; }
+.warn[hidden] { display: none; }
+.warn { position: relative; display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--text-muted); }
+.hint {
+  width: 13px; height: 13px; flex: none; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--border); border-radius: 50%;
+  background: transparent; color: var(--text-muted);
+  font: inherit; font-size: 9px; line-height: 1; cursor: help;
+}
+.hint:hover, .warn.open .hint { color: var(--text-primary); border-color: var(--text-muted); }
+.hint-pop {
+  position: absolute; left: 0; bottom: 100%; margin-bottom: 7px; z-index: 3;
+  display: none; width: 330px; padding: 9px 11px; text-align: left;
+  border: 1px solid var(--border); border-radius: 9px;
+  background: var(--surface-1); color: var(--text-secondary);
+  font-size: 10.5px; line-height: 1.5;
+  box-shadow: 0 6px 20px #00000026;
+}
+.hint-pop b { color: var(--text-primary); font-weight: 600; }
+.hint-pop p { margin: 0 0 5px; }
+.hint-pop p:last-child { margin-bottom: 0; }
+.warn.open .hint-pop, .hint:hover + .hint-pop, .hint:focus-visible + .hint-pop { display: block; }
+.link {
+  margin-left: auto; font: inherit; font-size: 10.5px;
+  border: 0; background: none; color: var(--text-muted); cursor: pointer; padding: 2px 0;
+}
+.link:hover { color: var(--text-primary); text-decoration: underline; }
