@@ -1,0 +1,58 @@
+<!doctype html><meta charset="utf-8">
+<style>html,body{margin:0;padding:0;background:#fff}canvas{display:block}</style>
+<canvas id="c" width="512" height="512"></canvas>
+<p>Правый клик по картинке → «Сохранить изображение», затем уменьшить до 128/48/32/16.</p>
+<script>
+const S = 512, BG = '#ffc2d6', LW = 46,   // LW — белая обводка в единицах шрифта
+       FONT = w => `800 ${w}px -apple-system, "SF Pro Display", "Helvetica Neue", Arial, sans-serif`;
+const BASE = 600;
+
+// измеряем реальные границы «чернил» глифа, а не метрики шрифта
+function ink(ch) {
+  const n = 1400, cv = document.createElement('canvas');
+  cv.width = cv.height = n;
+  const x = cv.getContext('2d');
+  x.font = FONT(BASE); x.textBaseline = 'alphabetic'; x.fillStyle = '#000';
+  x.fillText(ch, n / 2, n / 2);                       // перо в центре
+  const d = x.getImageData(0, 0, n, n).data;
+  let x0 = n, y0 = n, x1 = -1, y1 = -1;
+  for (let py = 0; py < n; py++) for (let px = 0; px < n; px++) {
+    if (d[(py * n + px) * 4 + 3] > 10) {
+      if (px < x0) x0 = px; if (px > x1) x1 = px;
+      if (py < y0) y0 = py; if (py > y1) y1 = py;
+    }
+  }
+  // координаты относительно точки пера
+  return { x0: x0 - n / 2, y0: y0 - n / 2, w: x1 - x0 + 1, h: y1 - y0 + 1 };
+}
+
+const A = ink('A'), B = ink('B');
+// обводка выходит за границы глифа — закладываем её в раскладку
+const hA = A.h + LW, hB = B.h + LW, wA = A.w + LW, wB = B.w + LW;
+const H = 0.86 * S, GAP = 0.012 * S, MAXW = 0.96 * S;
+let sA = H / hA, sB = H / hB;                          // обе буквы ровно одной высоты
+let total = wA * sA + GAP + wB * sB;
+const k = Math.min(1, MAXW / total);
+sA *= k; sB *= k; total *= k;
+const hInk = H * k;
+const left = (S - total) / 2, top = (S - hInk) / 2;
+
+const g = document.getElementById('c').getContext('2d');
+g.fillStyle = BG; g.fillRect(0, 0, S, S);
+const put = (ch, box, s, x, color) => {
+  g.save();
+  g.translate(x + (LW / 2 - box.x0) * s, top + (LW / 2 - box.y0) * s);
+  g.scale(s, s);
+  g.font = FONT(BASE); g.textBaseline = 'alphabetic';
+  g.lineJoin = 'round'; g.miterLimit = 2;
+  g.strokeStyle = '#ffffff'; g.lineWidth = LW;
+  g.strokeText(ch, 0, 0);
+  g.fillStyle = color;
+  g.fillText(ch, 0, 0);
+  g.restore();
+};
+put('A', A, sA, left, '#1b60c4');
+put('B', B, sB, left + wA * sA + GAP, '#d02f2e');
+document.title = 'icon';
+
+</script>
