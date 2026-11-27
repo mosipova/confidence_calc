@@ -173,10 +173,8 @@ body {
   font: inherit; font-size: 11px; font-variant-numeric: tabular-nums;
   padding: 0; border: 0; background: none; cursor: pointer;
   color: var(--text-muted);
-  border-bottom: 1px dashed var(--text-muted);
 }
-.pbtn:hover { color: var(--text-primary); border-bottom-color: var(--text-primary); }
-.pwrap.open .pbtn { color: var(--text-primary); border-bottom-color: var(--text-primary); }
+.pbtn:hover, .pwrap.open .pbtn { color: var(--text-primary); }
 .hint-mark { cursor: help; }
 .pwrap:hover .hint-mark, .pwrap.open .hint-mark { color: var(--text-primary); border-color: var(--text-muted); }
 .pwrap:hover .hint-pop, .pwrap.open .hint-pop { display: block; }
