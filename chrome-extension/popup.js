@@ -219,6 +219,13 @@ document.addEventListener('keydown', e => {
   }
 });
 
+$('vSub').addEventListener('click', e => {
+  if (!e.target.closest('#pWrap')) return;
+  e.stopPropagation();
+  const open = $('pWrap').classList.toggle('open');
+  $('pHint').setAttribute('aria-expanded', String(open));
+});
+
 $('reset').addEventListener('click', () => {
   for (const k of ['a', 'b']) for (const f of ['n', 'x', 'p']) S[k][f].value = '';
   S.a.n.focus();
@@ -318,7 +325,10 @@ function render() {
     const rel = c.rel !== null ? ` (${c.rel > 0 ? '+' : '−'}${ru(Math.abs(c.rel) * 100, 1)}% отн.)` : '';
     $('vSub').innerHTML = `${esc(pp(c.d, dec))}${esc(rel)}`
       + ` · ДИ ${cl}%: от ${esc(ppn(c.lo, dec))} до ${esc(pp(c.hi, dec))}`
-      + ` <i>${esc(pval(c.p))}</i>`;
+      + ` <span class="pwrap" id="pWrap">`
+      + `<button type="button" class="pbtn" id="pHint" aria-label="Что такое p-value" aria-expanded="false">${esc(pval(c.p))}</button>`
+      + `<span class="hint hint-mark" aria-hidden="true">?</span>`
+      + `<span class="hint-pop pop-down" role="tooltip">${pHintText(c)}</span></span>`;
   }
 
   const rough = (a && a.rough) || (b && b.rough);
@@ -334,6 +344,18 @@ function render() {
   paintHover();
 
   localStorage.setItem('v', JSON.stringify(['a', 'b'].flatMap(k => ['n', 'x', 'p'].map(f => S[k][f].value))));
+}
+
+function pHintText(c) {
+  const alpha = (100 - cl) / 100;
+  const chance = Math.round(c.p * 100);
+  return '<p><b>Что такое p-value</b></p>'
+    + '<p>Это вероятность получить такую же или ещё большую разницу <b>случайно</b>, '
+    + 'если на самом деле конверсии одинаковые.</p>'
+    + `<p>Сейчас ${esc(pval(c.p))}: даже при полном отсутствии разницы примерно в <b>${chance} случаях из 100</b> `
+    + 'выборки разошлись бы не меньше, чем у вас.</p>'
+    + `<p>Чем меньше p, тем хуже случайность объясняет увиденное. Порог задаёт уровень доверия: при ${cl}% `
+    + `разницу считают значимой, если <b>p < ${esc(ru(alpha, 2))}</b>.</p>`;
 }
 
 function plural(n, forms) {
@@ -409,8 +431,8 @@ function drawDist(a, b) {
     marks += `<circle cx="${xp.toFixed(1)}" cy="${y}" r="3.5" fill="${o.color}" stroke="var(--surface-1)" stroke-width="2"/>`;
     const dec = decFor((s.hi - s.lo) * 100);
     labels += `<text x="4" y="${y + 3.5}" font-size="9.5" font-weight="600" fill="var(--text-secondary)">${o.name}</text>`;
-    labels += `<text x="${(xlo - 6).toFixed(1)}" y="${y + 3.5}" text-anchor="end" font-size="9" fill="var(--text-muted)" font-variant-numeric="tabular-nums">${esc(pct(s.lo, dec))}</text>`;
-    labels += `<text x="${(xhi + 6).toFixed(1)}" y="${y + 3.5}" font-size="9" fill="var(--text-muted)" font-variant-numeric="tabular-nums">${esc(pct(s.hi, dec))}</text>`;
+    labels += `<text x="${(xlo - 6).toFixed(1)}" y="${y + 3.5}" text-anchor="end" font-size="9.5" font-weight="600" fill="var(--text-secondary)" font-variant-numeric="tabular-nums">${esc(pct(s.lo, dec))}</text>`;
+    labels += `<text x="${(xhi + 6).toFixed(1)}" y="${y + 3.5}" font-size="9.5" font-weight="600" fill="var(--text-secondary)" font-variant-numeric="tabular-nums">${esc(pct(s.hi, dec))}</text>`;
 
     const peakY = sy(npdf(s.p, s.p, s.sd));
     labels += `<circle cx="${(xp + 7).toFixed(1)}" cy="${(peakY - 7).toFixed(1)}" r="2.8" fill="${o.color}"/>`;
@@ -427,6 +449,7 @@ function drawDist(a, b) {
 function drawDiff(c) {
   const W = 488, padL = 52, padR = 52, top = 6, base = 58, barY = 74, axisY = 92;
   if (!c) {
+    $('diffCap').textContent = 'Разница B − A, п.п.';
     diff.innerHTML = `<text x="${W / 2}" y="40" text-anchor="middle" font-size="11.5" fill="var(--text-muted)">появится, когда заполните обе выборки</text>`;
     diff.setAttribute('aria-label', 'Разница появится после заполнения второй выборки');
     return;
@@ -468,8 +491,8 @@ function drawDiff(c) {
 
   const dec = decFor(Math.abs(c.hi - c.lo) * 100);
   const halo = 'stroke="var(--surface-1)" stroke-width="3" paint-order="stroke"';
-  m += `<text x="${(sx(c.lo) - 6).toFixed(1)}" y="${barY + 3.5}" text-anchor="end" font-size="9" fill="var(--text-muted)" font-variant-numeric="tabular-nums" ${halo}>${esc(ppn(c.lo, dec))}</text>`;
-  m += `<text x="${(sx(c.hi) + 6).toFixed(1)}" y="${barY + 3.5}" font-size="9" fill="var(--text-muted)" font-variant-numeric="tabular-nums" ${halo}>${esc(ppn(c.hi, dec))}</text>`;
+  m += `<text x="${(sx(c.lo) - 6).toFixed(1)}" y="${barY + 3.5}" text-anchor="end" font-size="9.5" font-weight="600" fill="var(--text-secondary)" font-variant-numeric="tabular-nums" ${halo}>${esc(ppn(c.lo, dec))}</text>`;
+  m += `<text x="${(sx(c.hi) + 6).toFixed(1)}" y="${barY + 3.5}" font-size="9.5" font-weight="600" fill="var(--text-secondary)" font-variant-numeric="tabular-nums" ${halo}>${esc(ppn(c.hi, dec))}</text>`;
   diff.innerHTML = g + m;
   diff.setAttribute('aria-label', `Разница B − A: ${pp(c.d, dec)}, интервал ${pp(c.lo, dec)} … ${pp(c.hi, dec)}`);
 }
